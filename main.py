@@ -102,6 +102,9 @@ class MinstallApp(App):
 
     def __init__(self, debug_mode: bool = False):
         super().__init__()
+        # Явно задаем светлую тему из палитры Textual
+        self.theme = "textual-light"
+        
         self.debug_mode = debug_mode
         ini_path = "minst.ini"
         if os.path.exists(ini_path):
@@ -166,13 +169,11 @@ class MinstallApp(App):
                         log_widget.write_line(f"[УСПЕШНО] {prog['name']} (симуляция завершена)")
                     else:
                         log_widget.write_line(f"[ЗАПУСК] Выполняем: {command}")
-                        # Реальный запуск процесса в фоновом режиме
                         process = await asyncio.create_subprocess_shell(
                             command,
                             stdout=asyncio.subprocess.PIPE,
                             stderr=asyncio.subprocess.PIPE
                         )
-                        # Ждем завершения установки программы
                         stdout, stderr = await process.communicate()
                         
                         if process.returncode == 0:
