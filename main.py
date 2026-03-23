@@ -6,6 +6,8 @@ from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Checkbox, Button, Label, Log
 from textual.containers import VerticalScroll, Center
 
+import argparse
+
 def parse_ini_file(ini_path: str, base_dir: str = ".") -> List[Dict[str, Any]]:
     """
     Парсит INI-файл конфигурации MInstAll и возвращает список программ для установки.
@@ -98,8 +100,9 @@ class MinstallApp(App):
         ("q", "quit", "Выход")
     ]
 
-    def __init__(self):
+    def __init__(self, debug_mode: bool = False):
         super().__init__()
+        self.debug_mode = debug_mode
         ini_path = "minst.ini"
         if os.path.exists(ini_path):
             self.programs = prepare_installation_list(ini_path)
@@ -135,7 +138,9 @@ class MinstallApp(App):
             button.disabled = True
             button.label = "Идет установка..."
             log_widget.clear()
-            log_widget.write_line("=== Начало процесса установки ===")
+            
+            mode_text = "[DEBUG РЕЖИМ]" if self.debug_mode else "[РЕАЛЬНАЯ УСТАНОВКА]"
+            log_widget.write_line(f"=== Начало процесса установки {mode_text} ===")
 
             selected_ids = []
             for checkbox in self.query(Checkbox):
@@ -154,11 +159,26 @@ class MinstallApp(App):
                     log_widget.write_line(f"\n[ОЖИДАНИЕ] Подготовка: {prog['name']}...")
                     
                     command = f'"{prog["real_path"]}" {prog["flags"]}'
-                    log_widget.write_line(f"[СИМУЛЯЦИЯ КОМАНДЫ] Выполняем: {command}")
                     
-                    await asyncio.sleep(2.0)
-                    
-                    log_widget.write_line(f"[УСПЕШНО] {prog['name']} установлена!")
+                    if self.debug_mode:
+                        log_widget.write_line(f"[СИМУЛЯЦИЯ] Выполняем: {command}")
+                        await asyncio.sleep(2.0)
+                        log_widget.write_line(f"[УСПЕШНО] {prog['name']} (симуляция завершена)")
+                    else:
+                        log_widget.write_line(f"[ЗАПУСК] Выполняем: {command}")
+                        # Реальный запуск процесса в фоновом режиме
+                        process = await asyncio.create_subprocess_shell(
+                            command,
+                            stdout=asyncio.subprocess.PIPE,
+                            stderr=asyncio.subprocess.PIPE
+                        )
+                        # Ждем завершения установки программы
+                        stdout, stderr = await process.communicate()
+                        
+                        if process.returncode == 0:
+                            log_widget.write_line(f"[УСПЕШНО] {prog['name']} установлена!")
+                        else:
+                            log_widget.write_line(f"[ОШИБКА] Код: {process.returncode} для {prog['name']}")
 
             log_widget.write_line("\n=== Установка всех выбранных программ завершена! ===")
             
@@ -166,5 +186,9 @@ class MinstallApp(App):
             button.label = "Установка завершена (повторить?)"
 
 if __name__ == "__main__":
-    app = MinstallApp()
+    parser = argparse.ArgumentParser(description="MInstAll TUI на Python")
+    parser.add_argument("--debug", action="store_true", help="Запуск в режиме симуляции установки")
+    args = parser.parse_args()
+
+    app = MinstallApp(debug_mode=args.debug)
     app.run()
