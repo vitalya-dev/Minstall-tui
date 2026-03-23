@@ -77,22 +77,26 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 class MinstallApp(App):
     """Приложение MInstAll TUI с выбором программ."""
     
+    # Добавили правило для Button, чтобы кнопки тоже рендерились ASCII-символами
     CSS = """
     #program-list {
         height: 1fr;
-        border: solid green;
+        border: ascii green;
         margin: 1 2;
         padding: 1;
     }
     #log-view {
         height: 1fr;
-        border: solid blue;
+        border: ascii blue;
         margin: 0 2 1 2;
     }
     #action-panel {
         height: auto;
         align: center middle;
         margin-bottom: 1;
+    }
+    Button {
+        border: ascii;
     }
     """
 
@@ -102,7 +106,6 @@ class MinstallApp(App):
 
     def __init__(self, debug_mode: bool = False):
         super().__init__()
-        # Явно задаем светлую тему из палитры Textual
         self.theme = "textual-light"
         
         self.debug_mode = debug_mode
