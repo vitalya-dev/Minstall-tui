@@ -1,8 +1,8 @@
 import configparser
 import os
-from typing import List, Dict
+from typing import List, Dict, Any
 
-def parse_ini_file(ini_path: str, base_dir: str = ".") -> List[Dict[str, str]]:
+def parse_ini_file(ini_path: str, base_dir: str = ".") -> List[Dict[str, Any]]:
     """
     Парсит INI-файл конфигурации MInstAll и возвращает список программ для установки.
     
@@ -39,7 +39,6 @@ def parse_ini_file(ini_path: str, base_dir: str = ".") -> List[Dict[str, str]]:
             
             if patch_path:
                 # Заменяем макрос {Patch} на базовую директорию
-                # Также заменяем обратные слеши на разделитель текущей ОС (полезно при разработке на Linux)
                 clean_path = patch_path.replace('{Patch}', base_dir).replace('\\', os.sep)
                 exe_path = os.path.normpath(clean_path)
                 
@@ -52,13 +51,3 @@ def parse_ini_file(ini_path: str, base_dir: str = ".") -> List[Dict[str, str]]:
                 })
                 
     return programs
-
-# Пример использования (можно запустить файл напрямую для проверки)
-if __name__ == "__main__":
-    # Если в текущей папке есть minst.ini, он его прочитает и выведет первые 3 программы
-    if os.path.exists("minst.ini"):
-        progs = parse_ini_file("minst.ini")
-        for p in progs[:3]:
-            print(p)
-    else:
-        print("Файл minst.ini не найден для тестирования.")

@@ -1,8 +1,8 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Any
 from parser import parse_ini_file
 
-def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict]:
+def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[str, Any]]:
     """
     Получает список программ из INI-файла и сопоставляет их с реальными .exe файлами 
     в папке со скриптом.
@@ -19,13 +19,12 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict]:
         if not exe_path:
             continue
             
-        # Извлекаем только имя файла (например, из '{Patch}\software\prog.exe' получим 'prog.exe')
+        # Извлекаем только имя файла
         file_name = os.path.basename(exe_path)
         
         # Проверяем, есть ли такой файл среди тех, что лежат рядом со скриптом
         if file_name.lower() in local_files:
             prog["exists"] = True
-            # Записываем прямой путь к файлу, чтобы потом его было легко запустить
             prog["real_path"] = os.path.join(base_dir, file_name)
             available_programs.append(prog)
 
