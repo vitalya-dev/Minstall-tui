@@ -77,7 +77,8 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 class MinstallApp(App):
     """Приложение MInstAll TUI с выбором программ."""
     
-    # Добавили правило для Button, чтобы кнопки тоже рендерились ASCII-символами
+    # Мы добавили *:focus { outline: ascii; }, чтобы при выборе любого элемента
+    # (чекбокса, кнопки, поля) рамка фокуса рисовалась обычными символами.
     CSS = """
     #program-list {
         height: 1fr;
@@ -97,6 +98,9 @@ class MinstallApp(App):
     }
     Button {
         border: ascii;
+    }
+    *:focus {
+        outline: ascii !important;
     }
     """
 
