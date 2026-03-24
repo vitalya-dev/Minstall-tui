@@ -80,49 +80,25 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 class MinstallApp(App):
     """Приложение MInstAll TUI с выбором программ."""
     
-    # Стилизация под Far Manager: синий фон, двойные бирюзовые рамки
+    # Возвращаем классический стиль Textual.
+    # Благодаря chcp 65001 в батнике, юникодные сплошные (solid) рамки
+    # теперь будут отлично работать без всяких вопросиков!
     CSS = """
-    Screen {
-        background: #0000AA;
-        color: #E0E0E0;
-    }
     #program-list {
         height: 1fr;
-        border: double #00FFFF;
-        background: #0000AA;
+        border: solid green;
         margin: 1 2;
         padding: 1;
     }
     #log-view {
         height: 1fr;
-        border: double #00FFFF;
-        background: #0000AA;
+        border: solid blue;
         margin: 0 2 1 2;
     }
     #action-panel {
         height: auto;
         align: center middle;
         margin-bottom: 1;
-    }
-    Button {
-        background: #00AAAA;
-        color: white;
-        border: none;
-    }
-    Button:focus {
-        background: #00FFFF;
-        color: black;
-        text-style: bold;
-    }
-    Checkbox {
-        color: #00FFFF;
-    }
-    Checkbox:focus {
-        background: #00AAAA;
-        color: white;
-    }
-    *:focus {
-        outline: none;
     }
     """
 
@@ -132,8 +108,8 @@ class MinstallApp(App):
 
     def __init__(self, debug_mode: bool = False):
         super().__init__()
-        # Возвращаем темную тему как базовую, чтобы цвета лучше ложились
-        self.theme = "textual-dark"
+        # Возвращаем светлую тему
+        self.theme = "textual-light"
         
         self.debug_mode = debug_mode
         ini_path = "minst.ini"
@@ -185,7 +161,7 @@ class MinstallApp(App):
             button.label = "Идет установка..."
             log_widget.clear()
             
-            # Запускаем тяжелую работу в отдельном фоновом потоке!
+            # Запускаем тяжелую работу в отдельном фоновом потоке
             self.run_installation(selected_ids)
 
     @work(thread=True)
@@ -196,7 +172,6 @@ class MinstallApp(App):
         """
         log_widget = self.query_one("#log-view", Log)
         
-        # Вспомогательная функция для безопасного вывода текста из фонового потока в UI
         def log_msg(text: str):
             self.call_from_thread(log_widget.write_line, text)
             
@@ -210,12 +185,10 @@ class MinstallApp(App):
                 
                 if self.debug_mode:
                     log_msg(f"[СИМУЛЯЦИЯ] Выполняем: {command}")
-                    # Используем обычный синхронный sleep, так как мы в отдельном потоке
                     time.sleep(2.0) 
                     log_msg(f"[ЗАВЕРШЕНО] {prog['name']} (симуляция завершена)")
                 else:
                     log_msg(f"[ЗАПУСК] Выполняем: {command}")
-                    # Используем стандартный синхронный subprocess
                     try:
                         process = subprocess.run(command, shell=True, capture_output=True)
                         log_msg(f"[ЗАВЕРШЕНО] {prog['name']} (Код: {process.returncode})")
@@ -224,15 +197,12 @@ class MinstallApp(App):
 
         log_msg("\n=== Установка всех выбранных программ завершена! ===")
         
-        # Вспомогательная функция для возврата кнопки в исходное состояние
         def reset_button():
             btn = self.query_one("#install-btn", Button)
             btn.disabled = False
             btn.label = "Установка завершена (повторить?)"
             
-        # Возвращаем UI в исходное состояние
         self.call_from_thread(reset_button)
-        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MInstAll TUI на Python")
     parser.add_argument("--debug", action="store_true", help="Запуск в режиме симуляции установки")
