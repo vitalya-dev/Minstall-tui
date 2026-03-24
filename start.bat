@@ -10,8 +10,8 @@ echo ===================================================
 echo               ГЛАВНОЕ МЕНЮ ФЛЕШКИ
 echo ===================================================
 echo.
-echo  1 - Запустить MInstAll (Автоматическая установка)
-echo  2 - Запустить Snappy Driver Installer (SDI_RUS)
+echo  1 - Запустить MInstAll (Автоматическая установка софта)
+echo  2 - Запустить Snappy Driver Installer (SDI)
 echo  3 - Какая-то твоя утилита (Резерв)
 echo.
 echo  0 - Выход
@@ -37,16 +37,16 @@ goto main_menu
 echo.
 echo Запускаю MInstAll в отдельном окне...
 cd Minstall-tui
-:: Используем start вместо call. Пустые кавычки "" нужны для корректной работы путей в Windows.
 start "" "install.bat"
 cd ..
 goto main_menu
 
 :run_sdi
 echo.
-echo Тут будет запуск драйверов...
-:: Например: cd SDI_RUS & call sdi.bat & cd ..
-pause
+echo Запускаю Snappy Driver Installer в отдельном окне...
+cd SDI_RUS
+start "" "SDI_x64_R2503.exe"
+cd ..
 goto main_menu
 
 :run_util
