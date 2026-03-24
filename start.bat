@@ -85,14 +85,8 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcon
 :: 2. Панель управления
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}" /t REG_DWORD /d 0 /f >nul
 
-:: 3. Ярлыки для Office (Word, Excel, PowerPoint) 
-:: (Предполагается стандартный путь установки Office 2016/2019/2021)
-powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell); $d=[Environment]::GetFolderPath('Desktop'); foreach($a in @('WINWORD','EXCEL','POWERPNT')){ $l=$s.CreateShortcut($d+'\'+$a+'.lnk'); $l.TargetPath='C:\Program Files\Microsoft Office\root\Office16\'+$a+'.exe'; $l.Save() }"
-
-:: 4. Перезапускаем Проводник, чтобы иконки появились моментально без перезагрузки ПК
-echo Перезапуск рабочего стола...
-taskkill /f /im explorer.exe >nul
-start explorer.exe
+:: 3. Ярлыки для Office с нормальными именами (Word, Excel, PowerPoint)
+powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell); $d=[Environment]::GetFolderPath('Desktop'); $apps=@{'Word'='WINWORD'; 'Excel'='EXCEL'; 'PowerPoint'='POWERPNT'}; foreach($name in $apps.Keys){ $l=$s.CreateShortcut($d+'\'+$name+'.lnk'); $l.TargetPath='C:\Program Files\Microsoft Office\root\Office16\'+$apps[$name]+'.exe'; $l.Save() }"
 
 echo.
 echo [УСПЕШНО] Значки добавлены на рабочий стол!
