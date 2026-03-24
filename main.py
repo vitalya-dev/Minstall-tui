@@ -1,13 +1,9 @@
 import os
-import time
 import argparse
-import subprocess
 import configparser
+import subprocess
+import time
 from typing import List, Dict, Any
-from textual import work
-from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Checkbox, Button, Label, Log
-from textual.containers import VerticalScroll, Center
 
 import argparse
 
@@ -77,136 +73,39 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 
     return available_programs
 
-class MinstallApp(App):
-    """Приложение MInstAll TUI с выбором программ."""
-    
-    # Возвращаем классический стиль Textual.
-    # Благодаря chcp 65001 в батнике, юникодные сплошные (solid) рамки
-    # теперь будут отлично работать без всяких вопросиков!
-    CSS = """
-    #program-list {
-        height: 1fr;
-        border: solid green;
-        margin: 1 2;
-        padding: 1;
-    }
-    #log-view {
-        height: 1fr;
-        border: solid blue;
-        margin: 0 2 1 2;
-    }
-    #action-panel {
-        height: auto;
-        align: center middle;
-        margin-bottom: 1;
-    }
+
+
+
+def main():
     """
-
-    BINDINGS = [
-        ("q", "quit", "Выход")
-    ]
-
-    def __init__(self, debug_mode: bool = False):
-        super().__init__()
-        # Возвращаем светлую тему
-        self.theme = "textual-light"
-        
-        self.debug_mode = debug_mode
-        ini_path = "minst.ini"
-        if os.path.exists(ini_path):
-            self.programs = prepare_installation_list(ini_path)
-        else:
-            self.programs = []
-
-    def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
-        
-        with VerticalScroll(id="program-list"):
-            if not self.programs:
-                yield Label("Файл minst.ini не найден или в папке нет подходящих .exe файлов.")
-            else:
-                for prog in self.programs:
-                    yield Checkbox(
-                        f"{prog['name']} (Ключи: {prog.get('flags', 'нет')})", 
-                        value=True, 
-                        id=f"prog_{prog['id']}"
-                    )
-
-        yield Log(id="log-view")
-
-        with Center(id="action-panel"):
-            yield Button("Установить выбранное", variant="success", id="install-btn")
-            
-        yield Footer()
-
-    async def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Обрабатывает нажатие кнопки в главном потоке интерфейса."""
-        if event.button.id == "install-btn":
-            button = event.button
-            log_widget = self.query_one("#log-view", Log)
-            
-            # Собираем ID всех выбранных программ
-            selected_ids = []
-            for checkbox in self.query(Checkbox):
-                if checkbox.value and checkbox.id and checkbox.id.startswith("prog_"):
-                    prog_id = checkbox.id.split("_")[1]
-                    selected_ids.append(prog_id)
-
-            if not selected_ids:
-                log_widget.write_line("Ошибка: Ни одной программы не выбрано!")
-                return
-
-            # Блокируем кнопку
-            button.disabled = True
-            button.label = "Идет установка..."
-            log_widget.clear()
-            
-            # Запускаем тяжелую работу в отдельном фоновом потоке
-            self.run_installation(selected_ids)
-
-    @work(thread=True)
-    def run_installation(self, selected_ids: list) -> None:
-        """
-        Эта функция работает в фоновом потоке. 
-        Она не блокирует интерфейс, и скролл будет работать плавно.
-        """
-        log_widget = self.query_one("#log-view", Log)
-        
-        def log_msg(text: str):
-            self.call_from_thread(log_widget.write_line, text)
-            
-        mode_text = "[DEBUG РЕЖИМ]" if self.debug_mode else "[РЕАЛЬНАЯ УСТАНОВКА]"
-        log_msg(f"=== Начало процесса установки {mode_text} ===")
-
-        for prog in self.programs:
-            if str(prog["id"]) in selected_ids:
-                log_msg(f"\n[ОЖИДАНИЕ] Подготовка: {prog['name']}...")
-                command = f'"{prog["real_path"]}" {prog["flags"]}'
-                
-                if self.debug_mode:
-                    log_msg(f"[СИМУЛЯЦИЯ] Выполняем: {command}")
-                    time.sleep(2.0) 
-                    log_msg(f"[ЗАВЕРШЕНО] {prog['name']} (симуляция завершена)")
-                else:
-                    log_msg(f"[ЗАПУСК] Выполняем: {command}")
-                    try:
-                        process = subprocess.run(command, shell=True, capture_output=True)
-                        log_msg(f"[ЗАВЕРШЕНО] {prog['name']} (Код: {process.returncode})")
-                    except Exception as e:
-                        log_msg(f"[ОШИБКА] Не удалось запустить {prog['name']}: {e}")
-
-        log_msg("\n=== Установка всех выбранных программ завершена! ===")
-        
-        def reset_button():
-            btn = self.query_one("#install-btn", Button)
-            btn.disabled = False
-            btn.label = "Установка завершена (повторить?)"
-            
-        self.call_from_thread(reset_button)
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="MInstAll TUI на Python")
+    Главная функция CLI-версии MInstAll.
+    Сканирует ini-файл и выводит список найденных программ.
+    """
+    parser = argparse.ArgumentParser(description="MInstAll CLI на Python")
     parser.add_argument("--debug", action="store_true", help="Запуск в режиме симуляции установки")
     args = parser.parse_args()
 
-    app = MinstallApp(debug_mode=args.debug)
-    app.run()
+    print("=" * 50)
+    print("=== MInstAll Автоматическая установка ===")
+    print(f"=== Режим: {'СИМУЛЯЦИЯ (DEBUG)' if args.debug else 'РЕАЛЬНАЯ УСТАНОВКА'} ===")
+    print("=" * 50)
+
+    ini_path = "minst.ini"
+    if not os.path.exists(ini_path):
+        print(f"\n[ОШИБКА] Файл {ini_path} не найден в текущей папке!")
+        return
+
+    print(f"\nСканирование {ini_path} и поиск .exe файлов...")
+    programs = prepare_installation_list(ini_path)
+
+    if not programs:
+        print("\n[ВНИМАНИЕ] Подходящих .exe файлов для установки не найдено.")
+        return
+
+    print(f"\nГотово к установке программ: {len(programs)}")
+    for i, prog in enumerate(programs, 1):
+        file_name = os.path.basename(prog["real_path"])
+        print(f" {i}. {prog['name']} (Файл: {file_name})")
+        
+    # Здесь в будущем будет вызов функции установки
+    print("\nПодготовка завершена...")
