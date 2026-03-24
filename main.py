@@ -80,16 +80,23 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 class MinstallApp(App):
     """Приложение MInstAll TUI с выбором программ."""
     
+    # Стилизация под Far Manager: синий фон, двойные бирюзовые рамки
     CSS = """
+    Screen {
+        background: #0000AA;
+        color: #E0E0E0;
+    }
     #program-list {
         height: 1fr;
-        border: ascii green;
+        border: double #00FFFF;
+        background: #0000AA;
         margin: 1 2;
         padding: 1;
     }
     #log-view {
         height: 1fr;
-        border: ascii blue;
+        border: double #00FFFF;
+        background: #0000AA;
         margin: 0 2 1 2;
     }
     #action-panel {
@@ -98,10 +105,24 @@ class MinstallApp(App):
         margin-bottom: 1;
     }
     Button {
-        border: ascii;
+        background: #00AAAA;
+        color: white;
+        border: none;
+    }
+    Button:focus {
+        background: #00FFFF;
+        color: black;
+        text-style: bold;
+    }
+    Checkbox {
+        color: #00FFFF;
+    }
+    Checkbox:focus {
+        background: #00AAAA;
+        color: white;
     }
     *:focus {
-        outline: ascii !important;
+        outline: none;
     }
     """
 
@@ -111,7 +132,8 @@ class MinstallApp(App):
 
     def __init__(self, debug_mode: bool = False):
         super().__init__()
-        self.theme = "textual-light"
+        # Возвращаем темную тему как базовую, чтобы цвета лучше ложились
+        self.theme = "textual-dark"
         
         self.debug_mode = debug_mode
         ini_path = "minst.ini"
@@ -210,7 +232,7 @@ class MinstallApp(App):
             
         # Возвращаем UI в исходное состояние
         self.call_from_thread(reset_button)
-
+        
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MInstAll TUI на Python")
     parser.add_argument("--debug", action="store_true", help="Запуск в режиме симуляции установки")
