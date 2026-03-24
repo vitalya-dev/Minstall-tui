@@ -123,7 +123,13 @@ def main():
         else:
             print(f"  -> [ЗАПУСК] Выполняем: {command}")
             try:
-                process = subprocess.run(command, shell=True, capture_output=True)
+                # Добавили stdin=subprocess.DEVNULL, чтобы инсталляторы не зависали в ожидании нажатия Enter
+                process = subprocess.run(
+                    command, 
+                    shell=True, 
+                    capture_output=True,
+                    stdin=subprocess.DEVNULL
+                )
                 print(f"  -> [ЗАВЕРШЕНО] {prog['name']} (Код: {process.returncode})\n")
             except Exception as e:
                 print(f"  -> [ОШИБКА] Не удалось запустить {prog['name']}: {e}\n")
