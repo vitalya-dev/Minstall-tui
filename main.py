@@ -173,7 +173,7 @@ class MinstallApp(App):
                     if self.debug_mode:
                         log_widget.write_line(f"[СИМУЛЯЦИЯ] Выполняем: {command}")
                         await asyncio.sleep(2.0)
-                        log_widget.write_line(f"[УСПЕШНО] {prog['name']} (симуляция завершена)")
+                        log_widget.write_line(f"[ЗАВЕРШЕНО] {prog['name']} (симуляция завершена)")
                     else:
                         log_widget.write_line(f"[ЗАПУСК] Выполняем: {command}")
                         process = await asyncio.create_subprocess_shell(
@@ -183,10 +183,8 @@ class MinstallApp(App):
                         )
                         stdout, stderr = await process.communicate()
                         
-                        if process.returncode == 0:
-                            log_widget.write_line(f"[УСПЕШНО] {prog['name']} установлена!")
-                        else:
-                            log_widget.write_line(f"[ОШИБКА] Код: {process.returncode} для {prog['name']}")
+                        # Выводим универсальное сообщение о завершении и код возврата
+                        log_widget.write_line(f"[ЗАВЕРШЕНО] {prog['name']} (Код: {process.returncode})")
 
             log_widget.write_line("\n=== Установка всех выбранных программ завершена! ===")
             
