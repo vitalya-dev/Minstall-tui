@@ -1,11 +1,11 @@
 import os
+import sys
+import ctypes
 import argparse
 import configparser
 import subprocess
 import time
 from typing import List, Dict, Any
-
-import argparse
 
 def parse_ini_file(ini_path: str, base_dir: str = ".") -> List[Dict[str, Any]]:
     """
@@ -73,7 +73,30 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 
     return available_programs
 
+def disable_quickedit():
+    """
+    Отключает 'Режим выделения' (QuickEdit Mode) в консоли Windows.
+    Это предотвращает случайное зависание скрипта при клике мышкой по окну.
+    """
+    if os.name == 'nt':  # Проверяем, что это точно Windows
+        try:
+            kernel32 = ctypes.windll.kernel32
+            STD_INPUT_HANDLE = -10
+            ENABLE_QUICK_EDIT_MODE = 0x0040
+            ENABLE_EXTENDED_FLAGS = 0x0080
 
+            handle = kernel32.GetStdHandle(STD_INPUT_HANDLE)
+            mode = ctypes.c_uint(0)
+            
+            # Получаем текущие настройки консоли
+            kernel32.GetConsoleMode(handle, ctypes.byref(mode))
+            
+            # Снимаем галочку с QuickEdit и применяем настройки
+            mode.value &= ~ENABLE_QUICK_EDIT_MODE
+            mode.value |= ENABLE_EXTENDED_FLAGS
+            kernel32.SetConsoleMode(handle, mode)
+        except Exception as e:
+            print(f"[ВНИМАНИЕ] Не удалось отключить QuickEdit: {e}")
 
 
 def main():
@@ -81,6 +104,9 @@ def main():
     Главная функция CLI-версии MInstAll.
     Сканирует ini-файл, выводит список и запускает установку найденных программ.
     """
+    # Защита от зависания при клике мышкой
+    disable_quickedit()
+    
     parser = argparse.ArgumentParser(description="MInstAll CLI на Python")
     parser.add_argument("--debug", action="store_true", help="Запуск в режиме симуляции установки")
     args = parser.parse_args()
