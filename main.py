@@ -1,7 +1,10 @@
 import os
-import asyncio
+import time
+import argparse
+import subprocess
 import configparser
 from typing import List, Dict, Any
+from textual import work
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Checkbox, Button, Label, Log
 from textual.containers import VerticalScroll, Center
@@ -77,8 +80,6 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 class MinstallApp(App):
     """Приложение MInstAll TUI с выбором программ."""
     
-    # Мы добавили *:focus { outline: ascii; }, чтобы при выборе любого элемента
-    # (чекбокса, кнопки, поля) рамка фокуса рисовалась обычными символами.
     CSS = """
     #program-list {
         height: 1fr;
@@ -141,17 +142,12 @@ class MinstallApp(App):
         yield Footer()
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Обрабатывает нажатие кнопки в главном потоке интерфейса."""
         if event.button.id == "install-btn":
             button = event.button
             log_widget = self.query_one("#log-view", Log)
             
-            button.disabled = True
-            button.label = "Идет установка..."
-            log_widget.clear()
-            
-            mode_text = "[DEBUG РЕЖИМ]" if self.debug_mode else "[РЕАЛЬНАЯ УСТАНОВКА]"
-            log_widget.write_line(f"=== Начало процесса установки {mode_text} ===")
-
+            # Собираем ID всех выбранных программ
             selected_ids = []
             for checkbox in self.query(Checkbox):
                 if checkbox.value and checkbox.id and checkbox.id.startswith("prog_"):
@@ -160,36 +156,60 @@ class MinstallApp(App):
 
             if not selected_ids:
                 log_widget.write_line("Ошибка: Ни одной программы не выбрано!")
-                button.disabled = False
-                button.label = "Установить выбранное"
                 return
 
-            for prog in self.programs:
-                if str(prog["id"]) in selected_ids:
-                    log_widget.write_line(f"\n[ОЖИДАНИЕ] Подготовка: {prog['name']}...")
-                    
-                    command = f'"{prog["real_path"]}" {prog["flags"]}'
-                    
-                    if self.debug_mode:
-                        log_widget.write_line(f"[СИМУЛЯЦИЯ] Выполняем: {command}")
-                        await asyncio.sleep(2.0)
-                        log_widget.write_line(f"[ЗАВЕРШЕНО] {prog['name']} (симуляция завершена)")
-                    else:
-                        log_widget.write_line(f"[ЗАПУСК] Выполняем: {command}")
-                        process = await asyncio.create_subprocess_shell(
-                            command,
-                            stdout=asyncio.subprocess.PIPE,
-                            stderr=asyncio.subprocess.PIPE
-                        )
-                        stdout, stderr = await process.communicate()
-                        
-                        # Выводим универсальное сообщение о завершении и код возврата
-                        log_widget.write_line(f"[ЗАВЕРШЕНО] {prog['name']} (Код: {process.returncode})")
-
-            log_widget.write_line("\n=== Установка всех выбранных программ завершена! ===")
+            # Блокируем кнопку
+            button.disabled = True
+            button.label = "Идет установка..."
+            log_widget.clear()
             
-            button.disabled = False
-            button.label = "Установка завершена (повторить?)"
+            # Запускаем тяжелую работу в отдельном фоновом потоке!
+            self.run_installation(selected_ids)
+
+    @work(thread=True)
+    def run_installation(self, selected_ids: list) -> None:
+        """
+        Эта функция работает в фоновом потоке. 
+        Она не блокирует интерфейс, и скролл будет работать плавно.
+        """
+        log_widget = self.query_one("#log-view", Log)
+        
+        # Вспомогательная функция для безопасного вывода текста из фонового потока в UI
+        def log_msg(text: str):
+            self.call_from_thread(log_widget.write_line, text)
+            
+        mode_text = "[DEBUG РЕЖИМ]" if self.debug_mode else "[РЕАЛЬНАЯ УСТАНОВКА]"
+        log_msg(f"=== Начало процесса установки {mode_text} ===")
+
+        for prog in self.programs:
+            if str(prog["id"]) in selected_ids:
+                log_msg(f"\n[ОЖИДАНИЕ] Подготовка: {prog['name']}...")
+                command = f'"{prog["real_path"]}" {prog["flags"]}'
+                
+                if self.debug_mode:
+                    log_msg(f"[СИМУЛЯЦИЯ] Выполняем: {command}")
+                    # Используем обычный синхронный sleep, так как мы в отдельном потоке
+                    time.sleep(2.0) 
+                    log_msg(f"[ЗАВЕРШЕНО] {prog['name']} (симуляция завершена)")
+                else:
+                    log_msg(f"[ЗАПУСК] Выполняем: {command}")
+                    # Используем стандартный синхронный subprocess
+                    try:
+                        process = subprocess.run(command, shell=True, capture_output=True)
+                        log_msg(f"[ЗАВЕРШЕНО] {prog['name']} (Код: {process.returncode})")
+                    except Exception as e:
+                        log_msg(f"[ОШИБКА] Не удалось запустить {prog['name']}: {e}")
+
+        log_msg("\n=== Установка всех выбранных программ завершена! ===")
+        
+        # Вспомогательная функция для возврата кнопки в исходное состояние
+        def reset_button():
+            btn = self.query_one("#install-btn", Button)
+            btn.disabled = False
+            btn.label = "Установка завершена (повторить?)"
+            
+        # Возвращаем UI в исходное состояние
+        self.call_from_thread(reset_button)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MInstAll TUI на Python")
