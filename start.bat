@@ -12,7 +12,7 @@ echo ===================================================
 echo.
 echo  1 - Запустить MInstAll (Автоматическая установка софта)
 echo  2 - Запустить Snappy Driver Installer (SDI)
-echo  3 - Какая-то твоя утилита (Резерв)
+echo  3 - Установить Microsoft Office 2021
 echo.
 echo  0 - Выход
 echo.
@@ -24,7 +24,7 @@ set /p choice=" Выбери нужный пункт и нажми Enter: "
 :: Обрабатываем выбор
 if "%choice%"=="1" goto run_minstall
 if "%choice%"=="2" goto run_sdi
-if "%choice%"=="3" goto run_util
+if "%choice%"=="3" goto run_office
 if "%choice%"=="0" goto end
 
 :: Если ввели что-то другое
@@ -49,10 +49,11 @@ start "" "SDI_x64_R2503.exe"
 cd ..
 goto main_menu
 
-:run_util
+:run_office
 echo.
-echo Этот пункт пока в разработке!
-pause
+echo Запускаю установку Microsoft Office 2021 в отдельном окне...
+:: Запускаем Setup.exe по длинному пути, обязательно в кавычках из-за пробелов
+start "" "Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d\Setup.exe"
 goto main_menu
 
 :end
