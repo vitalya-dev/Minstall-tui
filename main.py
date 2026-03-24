@@ -79,7 +79,7 @@ def prepare_installation_list(ini_path: str, base_dir: str = ".") -> List[Dict[s
 def main():
     """
     Главная функция CLI-версии MInstAll.
-    Сканирует ini-файл и выводит список найденных программ.
+    Сканирует ini-файл, выводит список и запускает установку найденных программ.
     """
     parser = argparse.ArgumentParser(description="MInstAll CLI на Python")
     parser.add_argument("--debug", action="store_true", help="Запуск в режиме симуляции установки")
@@ -107,5 +107,27 @@ def main():
         file_name = os.path.basename(prog["real_path"])
         print(f" {i}. {prog['name']} (Файл: {file_name})")
         
-    # Здесь в будущем будет вызов функции установки
-    print("\nПодготовка завершена...")
+    print("\n" + "=" * 50)
+    print("=== НАЧАЛО УСТАНОВКИ ===")
+    print("=" * 50 + "\n")
+
+    # Цикл автоматической установки
+    for i, prog in enumerate(programs, 1):
+        print(f"[{i}/{len(programs)}] Установка: {prog['name']}...")
+        command = f'"{prog["real_path"]}" {prog["flags"]}'
+        
+        if args.debug:
+            print(f"  -> [СИМУЛЯЦИЯ] Выполняем: {command}")
+            time.sleep(2.0)
+            print(f"  -> [ЗАВЕРШЕНО] {prog['name']} (симуляция)\n")
+        else:
+            print(f"  -> [ЗАПУСК] Выполняем: {command}")
+            try:
+                process = subprocess.run(command, shell=True, capture_output=True)
+                print(f"  -> [ЗАВЕРШЕНО] {prog['name']} (Код: {process.returncode})\n")
+            except Exception as e:
+                print(f"  -> [ОШИБКА] Не удалось запустить {prog['name']}: {e}\n")
+
+    print("=" * 50)
+    print("=== УСТАНОВКА ВСЕХ ПРОГРАММ ЗАВЕРШЕНА ===")
+    print("=" * 50)
