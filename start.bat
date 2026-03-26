@@ -21,17 +21,24 @@ echo  0 - Выход
 echo.
 echo ===================================================
 
-:: Запрашиваем ввод от пользователя
-set /p choice=" Выбери нужный пункт и нажми Enter: "
+:: Запрашиваем ввод от пользователя (БЕЗ нажатия Enter)
+:: /C 1234560 - это список разрешенных кнопок
+:: /N - скрывает стандартную системную подсказку с кнопками
+:: /M - выводит наше собственное сообщение
+choice /C 1234560 /N /M " Выбери нужный пункт: "
 
-:: Обрабатываем выбор
-if "%choice%"=="1" goto run_minstall
-if "%choice%"=="2" goto run_sdi
-if "%choice%"=="3" goto run_office
-if "%choice%"=="4" goto run_massgrave
-if "%choice%"=="5" goto run_debloat
-if "%choice%"=="6" goto run_icons
-if "%choice%"=="0" goto end
+:: Обрабатываем выбор. 
+:: ВАЖНО: проверяется позиция символа в списке 1234560. 
+:: То есть кнопка '0' стоит на 7-м месте, поэтому её код будет 7.
+if %errorlevel% equ 1 goto run_minstall
+if %errorlevel% equ 2 goto run_sdi
+if %errorlevel% equ 3 goto run_office
+if %errorlevel% equ 4 goto run_massgrave
+if %errorlevel% equ 5 goto run_debloat
+if %errorlevel% equ 6 goto run_icons
+if %errorlevel% equ 7 goto end
+
+:: Защита от ошибок ввода больше не нужна, choice просто не даст нажать другие кнопки!
 
 :: Если ввели что-то другое
 echo.
@@ -59,7 +66,7 @@ goto main_menu
 echo.
 echo Запускаю установку Microsoft Office 2021 через PowerShell...
 :: Используем Start-Process в PowerShell для надежного запуска сложного пути
-powershell -NoProfile -Command "Start-Process -FilePath '%~dp0Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d\Setup.exe'"
+start "" powershell -NoProfile -Command "Start-Process -FilePath '%~dp0Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d\Setup.exe'"
 goto main_menu
 
 :run_massgrave
@@ -87,7 +94,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcon
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}" /t REG_DWORD /d 0 /f >nul
 
 :: 3. Ярлыки для Office с нормальными именами (Word, Excel, PowerPoint)
-powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell); $d=[Environment]::GetFolderPath('Desktop'); $apps=@{'Word'='WINWORD'; 'Excel'='EXCEL'; 'PowerPoint'='POWERPNT'}; foreach($name in $apps.Keys){ $l=$s.CreateShortcut($d+'\'+$name+'.lnk'); $l.TargetPath='C:\Program Files\Microsoft Office\root\Office16\'+$apps[$name]+'.exe'; $l.Save() }"
+start "" powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell); $d=[Environment]::GetFolderPath('Desktop'); $apps=@{'Word'='WINWORD'; 'Excel'='EXCEL'; 'PowerPoint'='POWERPNT'}; foreach($name in $apps.Keys){ $l=$s.CreateShortcut($d+'\'+$name+'.lnk'); $l.TargetPath='C:\Program Files\Microsoft Office\root\Office16\'+$apps[$name]+'.exe'; $l.Save() }"
 
 echo.
 echo [УСПЕШНО] Значки добавлены на рабочий стол!
