@@ -6,8 +6,8 @@ if %errorLevel% == 0 (
 ) else (
     :: Если прав нет, просим PowerShell перезапустить этот же скрипт от имени админа
     echo Запрашиваем права администратора...
-    powershell -Command "Start-Process '%~dpnx0' -Verb RunAs"
-    exit /b
+    powershell -NoProfile -Command "Start-Process '%~dpnx0' -Verb RunAs"
+    exit
 )
 
 :admin_ok
