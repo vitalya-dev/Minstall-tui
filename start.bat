@@ -58,7 +58,7 @@ goto main_menu
 :run_office
 echo.
 echo Запускаю установку Microsoft Office 2021 в отдельном окне...
-start "" "Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d\Setup.exe"
+start "" "%~dp0Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d\Setup.exe"
 goto main_menu
 
 :run_massgrave
