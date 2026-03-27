@@ -101,5 +101,56 @@ echo [УСПЕШНО] Значки добавлены на рабочий сто
 pause
 goto main_menu
 
+:run_wifi
+echo.
+echo Подключаюсь к Wi-Fi...
+
+:: ВАЖНО: Замени НАЗВАНИЕ_СЕТИ и ПАРОЛЬ_ОТ_СЕТИ на свои реальные данные!
+set "WIFI_SSID=VTI3"
+set "WIFI_PASS=12345678"
+set "WIFI_XML=%temp%\wifi_profile.xml"
+
+:: Генерируем временный XML-профиль для импорта
+echo ^<?xml version="1.0"?^> > "%WIFI_XML%"
+echo ^<WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1"^> >> "%WIFI_XML%"
+echo     ^<name^>%WIFI_SSID%^</name^> >> "%WIFI_XML%"
+echo     ^<SSIDConfig^> >> "%WIFI_XML%"
+echo         ^<SSID^> >> "%WIFI_XML%"
+echo             ^<name^>%WIFI_SSID%^</name^> >> "%WIFI_XML%"
+echo         ^</SSID^> >> "%WIFI_XML%"
+echo     ^</SSIDConfig^> >> "%WIFI_XML%"
+echo     ^<connectionType^>ESS^</connectionType^> >> "%WIFI_XML%"
+echo     ^<connectionMode^>auto^</connectionMode^> >> "%WIFI_XML%"
+echo     ^<MSM^> >> "%WIFI_XML%"
+echo         ^<security^> >> "%WIFI_XML%"
+echo             ^<authEncryption^> >> "%WIFI_XML%"
+echo                 ^<authentication^>WPA2PSK^</authentication^> >> "%WIFI_XML%"
+echo                 ^<encryption^>AES^</encryption^> >> "%WIFI_XML%"
+echo                 ^<useOneX^>false^</useOneX^> >> "%WIFI_XML%"
+echo             ^</authEncryption^> >> "%WIFI_XML%"
+echo             ^<sharedKey^> >> "%WIFI_XML%"
+echo                 ^<keyType^>passPhrase^</keyType^> >> "%WIFI_XML%"
+echo                 ^<protected^>false^</protected^> >> "%WIFI_XML%"
+echo                 ^<keyMaterial^>%WIFI_PASS%^</keyMaterial^> >> "%WIFI_XML%"
+echo             ^</sharedKey^> >> "%WIFI_XML%"
+echo         ^</security^> >> "%WIFI_XML%"
+echo     ^</MSM^> >> "%WIFI_XML%"
+echo ^</WLANProfile^> >> "%WIFI_XML%"
+
+:: Импортируем профиль в систему
+netsh wlan add profile filename="%WIFI_XML%" >nul
+
+:: Подключаемся к добавленной сети
+netsh wlan connect name="%WIFI_SSID%" >nul
+
+:: Заметаем следы (удаляем файл с открытым паролем)
+del "%WIFI_XML%" /f /q
+
+echo.
+echo [УСПЕШНО] Команда на подключение к сети "%WIFI_SSID%" отправлена!
+echo Пару секунд, и интернет должен появиться.
+pause
+goto main_menu
+
 :end
 exit
