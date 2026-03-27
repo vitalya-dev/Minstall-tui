@@ -100,8 +100,8 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcon
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}" /t REG_DWORD /d 0 /f >nul
 
 :: 3. Ярлыки для Office с нормальными именами (Word, Excel, PowerPoint)
-start "" powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell); $d=[Environment]::GetFolderPath('Desktop'); $apps=@{'Word'='WINWORD'; 'Excel'='EXCEL'; 'PowerPoint'='POWERPNT'}; foreach($name in $apps.Keys){ $l=$s.CreateShortcut($d+'\'+$name+'.lnk'); $l.TargetPath='C:\Program Files\Microsoft Office\root\Office16\'+$apps[$name]+'.exe'; $l.Save() }"
-
+:: 3. Копируем готовые ярлыки Office из меню "Пуск" на рабочий стол
+start "" powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $cp=[Environment]::GetFolderPath('CommonPrograms'); $up=[Environment]::GetFolderPath('Programs'); @('Word.lnk', 'Excel.lnk', 'PowerPoint.lnk') | ForEach-Object { $c=$cp+'\'+$_; $u=$up+'\'+$_; if(Test-Path $c){Copy-Item $c $d -Force} elseif(Test-Path $u){Copy-Item $u $d -Force} }"
 echo.
 echo [УСПЕШНО] Значки добавлены на рабочий стол!
 pause
