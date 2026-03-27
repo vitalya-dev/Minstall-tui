@@ -64,9 +64,15 @@ goto main_menu
 
 :run_office
 echo.
-echo Запускаю установку Microsoft Office 2021 через PowerShell...
-:: Используем Start-Process в PowerShell для надежного запуска сложного пути
-start "" powershell -NoProfile -Command "Start-Process -FilePath '%~dp0Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d\Setup.exe'"
+echo Запускаю установку Microsoft Office 2021...
+:: 1. Переходим прямо в папку с установщиком (кавычки спасают от пробелов)
+cd "Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d"
+
+:: 2. Спокойно запускаем Setup.exe в независимом окне
+start "" "Setup.exe"
+
+:: 3. Обязательно возвращаемся обратно в корень флешки!
+cd /d "%~dp0"
 goto main_menu
 
 :run_massgrave
