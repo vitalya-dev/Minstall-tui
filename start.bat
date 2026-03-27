@@ -1,7 +1,20 @@
 @echo off
 :: Включаем поддержку русского языка в консоли
 chcp 65001 >nul
-:: Делаем корень флешки рабочей папкой
+
+:: ===================================================
+:: ЗАПРОС ПРАВ АДМИНИСТРАТОРА
+:: ===================================================
+net session >nul 2>&1
+if %errorLevel% NEQ 0 (
+    echo.
+    echo Требуются права Администратора! Запрашиваю доступ...
+    powershell -Command "Start-Process -FilePath '%0' -Verb RunAs"
+    exit /b
+)
+:: ===================================================
+
+:: Делаем корень флешки рабочей папкой (это очень важно после перезапуска с админом!)
 cd /d "%~dp0"
 
 :main_menu
@@ -99,7 +112,6 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcon
 :: 2. Панель управления
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}" /t REG_DWORD /d 0 /f >nul
 
-:: 3. Ярлыки для Office с нормальными именами (Word, Excel, PowerPoint)
 :: 3. Копируем готовые ярлыки Office из меню "Пуск" на рабочий стол
 start "" powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $cp=[Environment]::GetFolderPath('CommonPrograms'); $up=[Environment]::GetFolderPath('Programs'); @('Word.lnk', 'Excel.lnk', 'PowerPoint.lnk') | ForEach-Object { $c=$cp+'\'+$_; $u=$up+'\'+$_; if(Test-Path $c){Copy-Item $c $d -Force} elseif(Test-Path $u){Copy-Item $u $d -Force} }"
 echo.
