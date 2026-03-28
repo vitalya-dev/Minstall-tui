@@ -122,24 +122,32 @@ goto main_menu
 
 :run_wifi
 echo.
-echo Подключаюсь к Wi-Fi (VTI3)...
+echo Подключаюсь к Wi-Fi (VTI3 и VTI3_Wi-Fi5)...
 
-:: Проверяем, лежит ли файлик на месте
-if not exist "Беспроводная сеть-VTI3.xml" (
-    echo [ОШИБКА] Файл "Беспроводная сеть-VTI3.xml" не найден рядом со скриптом!
-    pause
-    goto main_menu
+:: 1. Проверяем и добавляем обычную сеть VTI3
+if exist "Беспроводная сеть-VTI3.xml" (
+    netsh wlan add profile filename="Беспроводная сеть-VTI3.xml" >nul
+    echo [+] Профиль VTI3 добавлен.
+) else (
+    echo [-] Файл "Беспроводная сеть-VTI3.xml" не найден.
 )
 
-:: Импортируем твой готовый профиль в систему
-netsh wlan add profile filename="Беспроводная сеть-VTI3.xml" >nul
+:: 2. Проверяем и добавляем сеть VTI3_5G
+if exist "Беспроводная сеть-VTI3_Wi-Fi5.xml" (
+    netsh wlan add profile filename="Беспроводная сеть-VTI3_Wi-Fi5.xml" >nul
+    echo [+] Профиль VTI3_Wi-Fi5 добавлен.
+) else (
+    echo [-] Файл "Беспроводная сеть-VTI3_Wi-Fi5.xml" не найден.
+)
 
-:: Даем команду на подключение (имя профиля обычно совпадает с именем сети)
-netsh wlan connect name="VTI3" >nul
+:: 3. Отправляем команды на подключение
+:: Сначала пробуем 5G (как более быструю), затем обычную. 
+:: Винда сама разберется, какая из них доступна в данный момент.
+netsh wlan connect name="VTI3_Wi-Fi5" >nul 2>&1
+netsh wlan connect name="VTI3" >nul 2>&1
 
 echo.
-echo [УСПЕШНО] Профиль импортирован, команда на подключение к VTI3 отправлена!
-echo Интернет должен появиться с секунды на секунду.
+echo [ГОТОВО] Сети импортированы, команды на подключение отправлены!
 pause
 goto main_menu
 
