@@ -93,8 +93,9 @@ goto main_menu
 
 :run_massgrave
 echo.
-echo Запускаю свой PowerShell скрипт в отдельном окне...
-start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://get.activated.win | iex"
+echo Запускаю активатор MAS с параметрами...
+start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([ScriptBlock]::Create((irm https://get.activated.win))) /Z-WindowsESUOffice"
+timeout /t 3 >nul
 goto main_menu
 
 :run_debloat
