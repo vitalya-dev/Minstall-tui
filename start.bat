@@ -62,9 +62,9 @@ goto main_menu
 
 :run_minstall
 echo.
-echo Запускаю MInstAll в отдельном окне...
+echo Запускаю MInstAll в отдельном окне (исправление для Win 11)...
 cd Minstall-tui
-start "" "install.bat"
+start "" cmd /c "install.bat"
 cd ..
 goto main_menu
 
