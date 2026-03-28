@@ -30,20 +30,21 @@ echo  4 - Запустить Microsoft Activation Scripts
 echo  5 - Запустить Win11Debloat (Очистка Windows 11)
 echo  6 - Вывести иконки ПК, Панели управления и Office на рабочий стол
 echo  7 - Подключиться к Wi-Fi
+echo  8 - Открыть настройки Защитника Windows
 echo.
 echo  0 - Выход
 echo.
 echo ===================================================
 
 :: Запрашиваем ввод от пользователя (БЕЗ нажатия Enter)
-:: /C 12345670 - это список разрешенных кнопок
+:: /C 123456780 - это список разрешенных кнопок
 :: /N - скрывает стандартную системную подсказку с кнопками
 :: /M - выводит наше собственное сообщение
-choice /C 12345670 /N /M " Выбери нужный пункт: "
+choice /C 123456780 /N /M " Выбери нужный пункт: "
 
 :: Обрабатываем выбор.
-:: ВАЖНО: проверяется позиция символа в списке 12345670. 
-:: То есть кнопка '0' стоит на 8-м месте, поэтому её код будет 8.
+:: ВАЖНО: проверяется позиция символа в списке 123456780. 
+:: То есть кнопка '0' стоит на 9-м месте, поэтому её код будет 9.
 if %errorlevel% equ 1 goto run_minstall
 if %errorlevel% equ 2 goto run_sdi
 if %errorlevel% equ 3 goto run_office
@@ -51,7 +52,8 @@ if %errorlevel% equ 4 goto run_massgrave
 if %errorlevel% equ 5 goto run_debloat
 if %errorlevel% equ 6 goto run_icons
 if %errorlevel% equ 7 goto run_wifi
-if %errorlevel% equ 8 goto end
+if %errorlevel% equ 8 goto run_defender
+if %errorlevel% equ 9 goto end
 
 :: Защита от ошибок ввода больше не нужна, choice просто не даст нажать другие кнопки!
 :: Если ввели что-то другое
