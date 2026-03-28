@@ -72,9 +72,9 @@ goto main_menu
 
 :run_sdi
 echo.
-echo Запускаю Snappy Driver Installer в отдельном окне...
+echo Запускаю Snappy Driver Installer в автоматическом режиме...
 cd SDI_RUS
-start "" "SDI_x64_R2503.exe"
+start "" "SDI_x64_R2503.exe" -autoinstall
 cd ..
 goto main_menu
 
