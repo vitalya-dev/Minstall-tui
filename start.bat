@@ -73,9 +73,9 @@ goto main_menu
 :run_sdi
 echo.
 echo Запускаю Snappy Driver Installer в автоматическом режиме...
-cd SDI_RUS
-start "" "SDI_x64_R2503.exe" -autoinstall
-cd ..
+cd SDI_RUS\SDI
+start "" "SDI_x64_R2604.exe" -autoinstall
+cd ..\..
 goto main_menu
 
 :run_office
@@ -103,7 +103,7 @@ echo.
 echo Запускаю Win11Debloat в тихом режиме...
 :: Заменили двойные кавычки на одинарные вокруг ссылки, чтобы cmd не ругался
 :: Добавлены ключи -CLI и -Silent для автоматической очистки без интерфейса
-start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent"
+start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
 goto main_menu
 
 
