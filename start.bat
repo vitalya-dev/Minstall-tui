@@ -93,17 +93,53 @@ goto main_menu
 
 :run_massgrave
 echo.
-echo Запускаю активатор MAS с параметрами...
-start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([ScriptBlock]::Create((irm https://get.activated.win))) /Z-WindowsESUOffice"
-timeout /t 3 >nul
-goto main_menu
+echo Запускаю Microsoft Activation Scripts (оффлайн)...
 
-:run_debloat
-echo.
-echo Запускаю Win11Debloat в тихом режиме...
-:: Заменили двойные кавычки на одинарные вокруг ссылки, чтобы cmd не ругался
-:: Добавлены ключи -CLI и -Silent для автоматической очистки без интерфейса
-start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
+:: Путь к 7z и архиву
+set "ZIP_FILE=%~dp0Microsoft-Activation-Scripts.zip"
+set "EXTRACT_TO=%~dp0Microsoft-Activation-Scripts"
+set "SEVEN_ZIP=%~dp07z.exe"
+
+:: Если скрипт ещё не распакован — распаковываем
+if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
+    if not exist "%ZIP_FILE%" (
+        echo [ОШИБКА] Архив "%ZIP_FILE%" не найден!
+        pause
+        goto main_menu
+    )
+    if not exist "%SEVEN_ZIP%" (
+        echo [ОШИБКА] 7z.exe не найден в корне флешки!
+        pause
+        goto main_menu
+    )
+    
+    echo [-] Распаковываю архив, подожди...
+    "%SEVEN_ZIP%" x "%ZIP_FILE%" -o"%EXTRACT_TO%" -y >nul
+    
+    if errorlevel 1 (
+        echo [ОШИБКА] Не удалось распаковать архив!
+        pause
+        goto main_menu
+    )
+    echo [+] Готово!
+)
+
+:: Запускаем MAS_AIO.cmd с параметром для автоматической активации
+set "MAS_SCRIPT=%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd"
+
+if exist "%MAS_SCRIPT%" (
+    echo [+] Запускаю активацию Windows и Office...
+    
+    :: Запускаем в новом окне с параметром /Z для автоматической активации
+    start "" cmd /c "%MAS_SCRIPT%" /Z-WindowsESUOffice
+) else (
+    echo [ОШИБКА] MAS_AIO.cmd не найден!
+    echo Проверь структуру архива.
+    pause
+    goto main_menu
+)
+
+timeout /t 2 >nul
 goto main_menu
 
 
