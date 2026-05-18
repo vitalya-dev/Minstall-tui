@@ -99,6 +99,7 @@ echo Запускаю Microsoft Activation Scripts (оффлайн)...
 set "ZIP_FILE=%~dp0Microsoft-Activation-Scripts.zip"
 set "EXTRACT_TO=%~dp0Microsoft-Activation-Scripts"
 set "SEVEN_ZIP=%~dp07z.exe"
+set "ARCHIVE_PASSWORD=1"
 
 :: Если скрипт ещё не распакован — распаковываем
 if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
@@ -113,11 +114,12 @@ if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
         goto main_menu
     )
     
-    echo [-] Распаковываю архив, подожди...
-    "%SEVEN_ZIP%" x "%ZIP_FILE%" -o"%EXTRACT_TO%" -y >nul
+    echo [-] Распаковываю запароленный архив, подожди...
+    "%SEVEN_ZIP%" x "%ZIP_FILE%" -o"%EXTRACT_TO%" -p"%ARCHIVE_PASSWORD%" -y >nul
     
     if errorlevel 1 (
         echo [ОШИБКА] Не удалось распаковать архив!
+        echo Проверьте пароль сейчас: %ARCHIVE_PASSWORD%
         pause
         goto main_menu
     )
