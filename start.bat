@@ -144,6 +144,14 @@ if exist "%MAS_SCRIPT%" (
 timeout /t 2 >nul
 goto main_menu
 
+:run_debloat
+echo.
+echo Запускаю Win11Debloat в тихом режиме...
+:: Заменили двойные кавычки на одинарные вокруг ссылки, чтобы cmd не ругался
+:: Добавлены ключи -CLI и -Silent для автоматической очистки без интерфейса
+start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent"
+goto main_menu
+
 
 :run_icons
 echo.
