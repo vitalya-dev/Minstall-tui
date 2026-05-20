@@ -149,7 +149,7 @@ echo.
 echo Запускаю Win11Debloat в тихом режиме...
 :: Заменили двойные кавычки на одинарные вокруг ссылки, чтобы cmd не ругался
 :: Добавлены ключи -CLI и -Silent для автоматической очистки без интерфейса
-start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent"
+start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
 goto main_menu
 
 
