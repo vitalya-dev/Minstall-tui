@@ -65,7 +65,7 @@ goto main_menu
 :run_minstall
 echo.
 echo Запускаю MInstAll в отдельном окне (исправление для Win 11)...
-cd Minstall-tui
+cd core
 start "" cmd /c "install.bat"
 cd ..
 goto main_menu
@@ -175,19 +175,19 @@ echo.
 echo Подключаюсь к Wi-Fi (VTI3 и VTI3_Wi-Fi5)...
 
 :: 1. Проверяем и добавляем обычную сеть VTI3
-if exist "Беспроводная сеть-VTI3.xml" (
-    netsh wlan add profile filename="Беспроводная сеть-VTI3.xml" >nul
+if exist "wifi_profiles\Беспроводная сеть-VTI3.xml" (
+    netsh wlan add profile filename="wifi_profiles\Беспроводная сеть-VTI3.xml" >nul
     echo [+] Профиль VTI3 добавлен.
 ) else (
-    echo [-] Файл "Беспроводная сеть-VTI3.xml" не найден.
+    echo [-] Файл "wifi_profiles\Беспроводная сеть-VTI3.xml" не найден.
 )
 
 :: 2. Проверяем и добавляем сеть VTI3_Wi-Fi5
-if exist "Беспроводная сеть-VTI3_Wi-Fi5.xml" (
-    netsh wlan add profile filename="Беспроводная сеть-VTI3_Wi-Fi5.xml" >nul
+if exist "wifi_profiles\Беспроводная сеть-VTI3_Wi-Fi5.xml" (
+    netsh wlan add profile filename="wifi_profiles\Беспроводная сеть-VTI3_Wi-Fi5.xml" >nul
     echo [+] Профиль VTI3_Wi-Fi5 добавлен.
 ) else (
-    echo [-] Файл "Беспроводная сеть-VTI3_Wi-Fi5.xml" не найден.
+    echo [-] Файл "wifi_profiles\Беспроводная сеть-VTI3_Wi-Fi5.xml" не найден.
 )
 
 :: 3. Отправляем команды на подключение
