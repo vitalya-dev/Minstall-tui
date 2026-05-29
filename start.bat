@@ -31,13 +31,14 @@ echo  5 - Запустить Win11Debloat (Очистка Windows 11)
 echo  6 - Вывести иконки ПК, Панели управления и Office на рабочий стол
 echo  7 - Подключиться к Wi-Fi
 echo  8 - Открыть настройки Защитника Windows
+echo  9 - Автоматический режим (Установка, настройка, активация)
 echo.
 echo  0 - Выход
 echo.
 echo ===================================================
 
 :: Запрашиваем ввод от пользователя (БЕЗ нажатия Enter)
-choice /C 123456780 /N /M " Выбери нужный пункт: "
+choice /C 1234567890 /N /M " Выбери нужный пункт: "
 
 if %errorlevel% equ 1 goto run_minstall
 if %errorlevel% equ 2 goto run_sdi
@@ -47,7 +48,8 @@ if %errorlevel% equ 5 goto run_debloat
 if %errorlevel% equ 6 goto run_icons
 if %errorlevel% equ 7 goto run_wifi
 if %errorlevel% equ 8 goto run_defender
-if %errorlevel% equ 9 goto end
+if %errorlevel% equ 9 goto run_auto
+if %errorlevel% equ 10 goto end
 
 echo.
 echo [ОШИБКА] Неверный пункт меню! Попробуй еще раз.
