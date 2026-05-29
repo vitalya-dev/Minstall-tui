@@ -56,25 +56,25 @@ goto main_menu
 
 :run_minstall
 echo.
-echo Запускаю MInstAll в фоне...
+echo Запускаю MInstAll...
 cd core
-start /min "" cmd /c "install.bat"
+start "" cmd /c "install.bat"
 cd ..
 goto main_menu
 
 :run_sdi
 echo.
-echo Запускаю Snappy Driver Installer в фоне...
+echo Запускаю Snappy Driver Installer...
 cd SDI_RUS\SDI
-start /min "" "SDI_x64_R2604.exe" -autoinstall
+start "" "SDI_x64_R2604.exe" -autoinstall
 cd ..\..
 goto main_menu
 
 :run_office
 echo.
-echo Запускаю установку Microsoft Office 2021 в фоне...
+echo Запускаю установку Microsoft Office 2021...
 cd "Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d"
-start /min "" "Setup.exe"
+start "" "Setup.exe"
 cd /d "%~dp0"
 goto main_menu
 
@@ -98,7 +98,7 @@ if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
         pause
         goto main_menu
     )
-    
+ 
     echo [-] Распаковываю запароленный архив, подожди...
     "%SEVEN_ZIP%" x "%ZIP_FILE%" -o"%EXTRACT_TO%" -p"%ARCHIVE_PASSWORD%" -y >nul
     
@@ -114,8 +114,8 @@ if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
 set "MAS_SCRIPT=%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd"
 
 if exist "%MAS_SCRIPT%" (
-    echo [+] Запускаю активацию Windows и Office в фоне...
-    start /min "" cmd /c "%MAS_SCRIPT%" /Z-WindowsESUOffice
+    echo [+] Запускаю активацию Windows и Office...
+    start "" cmd /c "%MAS_SCRIPT%" /Z-WindowsESUOffice
 ) else (
     echo [ОШИБКА] MAS_AIO.cmd не найден!
     echo Проверь структуру архива.
@@ -128,9 +128,9 @@ goto main_menu
 
 :run_debloat
 echo.
-echo Запускаю Win11Debloat в скрытом режиме...
-:: Добавили -WindowStyle Hidden для полной невидимости консоли PS
-start /min "" powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
+echo Запускаю Win11Debloat...
+:: Убрали -WindowStyle Hidden для видимости работы скрипта
+start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
 goto main_menu
 
 :run_icons
@@ -138,8 +138,8 @@ echo.
 echo Добавляю значки на рабочий стол...
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}" /t REG_DWORD /d 0 /f >nul
-:: Скрытый запуск PowerShell
-start /min "" powershell -WindowStyle Hidden -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $cp=[Environment]::GetFolderPath('CommonPrograms'); $up=[Environment]::GetFolderPath('Programs'); @('Word.lnk', 'Excel.lnk', 'PowerPoint.lnk') | ForEach-Object { $c=$cp+'\'+$_; $u=$up+'\'+$_; if(Test-Path $c){Copy-Item $c $d -Force} elseif(Test-Path $u){Copy-Item $u $d -Force} }"
+:: Запуск PowerShell в видимом режиме
+start "" powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $cp=[Environment]::GetFolderPath('CommonPrograms'); $up=[Environment]::GetFolderPath('Programs'); @('Word.lnk', 'Excel.lnk', 'PowerPoint.lnk') | ForEach-Object { $c=$cp+'\'+$_; $u=$up+'\'+$_; if(Test-Path $c){Copy-Item $c $d -Force} elseif(Test-Path $u){Copy-Item $u $d -Force} }"
 echo.
 echo [УСПЕШНО] Значки добавлены на рабочий стол!
 pause
@@ -175,7 +175,7 @@ goto main_menu
 echo.
 echo Открываю раздел "Защита от вирусов и угроз"...
 echo.
-start /min "" "windowsdefender://threat"
+start "" "windowsdefender://threat"
 pause
 goto main_menu
 
