@@ -218,8 +218,56 @@ echo.
 echo [5/6] Запускаю Win11Debloat...
 start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
 
-:: Временно возвращаемся в меню. 
-:: На следующем шаге мы добавим ожидание установки Office, активацию и иконки.
+echo.
+echo [6/6] Ожидание завершения установки Office 2021...
+:wait_for_office
+tasklist /fi "imagename eq setup.exe" | find /i "setup.exe" >nul
+if %errorlevel% equ 0 (
+    timeout /t 5 >nul
+    goto wait_for_office
+)
+echo [+] Установка Office завершена!
+
+echo.
+echo [+] Запускаю Microsoft Activation Scripts (оффлайн)...
+set "ZIP_FILE=%~dp0Microsoft-Activation-Scripts.zip"
+set "EXTRACT_TO=%~dp0Microsoft-Activation-Scripts"
+set "SEVEN_ZIP=%~dp07z.exe"
+set "ARCHIVE_PASSWORD=1"
+
+if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
+    if not exist "%ZIP_FILE%" (
+        echo [ОШИБКА] Архив "%ZIP_FILE%" не найден!
+        goto skip_mas
+    )
+    if not exist "%SEVEN_ZIP%" (
+        echo [ОШИБКА] 7z.exe не найден в корне флешки!
+        goto skip_mas
+    )
+    echo [-] Распаковываю запароленный архив MAS...
+    "%SEVEN_ZIP%" x "%ZIP_FILE%" -o"%EXTRACT_TO%" -p"%ARCHIVE_PASSWORD%" -y >nul
+)
+
+set "MAS_SCRIPT=%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd"
+if exist "%MAS_SCRIPT%" (
+    echo [+] Запускаю активацию Windows и Office...
+    start "" cmd /c "%MAS_SCRIPT%" /Z-WindowsESUOffice
+) else (
+    echo [ОШИБКА] Скрипт активации не найден!
+)
+:skip_mas
+
+echo.
+echo [+] Добавляю значки на рабочий стол...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t REG_DWORD /d 0 /f >nul
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}" /t REG_DWORD /d 0 /f >nul
+start "" powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $cp=[Environment]::GetFolderPath('CommonPrograms'); $up=[Environment]::GetFolderPath('Programs'); @('Word.lnk', 'Excel.lnk', 'PowerPoint.lnk') | ForEach-Object { $c=$cp+'\'+$_; $u=$up+'\'+$_; if(Test-Path $c){Copy-Item $c $d -Force} elseif(Test-Path $u){Copy-Item $u $d -Force} }"
+
+echo.
+echo ===================================================
+echo     АВТОМАТИЧЕСКИЙ РЕЖИМ УСПЕШНО ЗАВЕРШЕН!
+echo ===================================================
+pause
 goto main_menu
 
 :end
