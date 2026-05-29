@@ -204,8 +204,22 @@ cd "Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office 
 start "" "Setup.exe"
 cd /d "%~dp0"
 
+echo.
+echo [4/6] Ожидание подключения к интернету...
+:wait_for_internet
+ping -n 1 -w 1000 8.8.8.8 >nul 2>&1
+if %errorlevel% neq 0 (
+    timeout /t 3 >nul
+    goto wait_for_internet
+)
+echo [+] Интернет подключен!
+
+echo.
+echo [5/6] Запускаю Win11Debloat...
+start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
+
 :: Временно возвращаемся в меню. 
-:: На следующем шаге мы заменим этот переход на ожидание интернета.
+:: На следующем шаге мы добавим ожидание установки Office, активацию и иконки.
 goto main_menu
 
 :end
