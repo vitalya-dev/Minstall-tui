@@ -205,11 +205,24 @@ start "" "Setup.exe"
 cd /d "%~dp0"
 
 echo.
-echo [4/6] Ожидание подключения к интернету...
+echo [4/6] Ожидание установки драйверов, Wi-Fi и интернета...
 :wait_for_internet
+
+:: Постоянно пытаемся импортировать сети и подключиться.
+:: Если драйвер еще не встал, команды просто проигнорируются.
+if exist "wifi_profiles\Беспроводная сеть-VTI3.xml" (
+    netsh wlan add profile filename="wifi_profiles\Беспроводная сеть-VTI3.xml" >nul 2>&1
+)
+if exist "wifi_profiles\Беспроводная сеть-VTI3_Wi-Fi5.xml" (
+    netsh wlan add profile filename="wifi_profiles\Беспроводная сеть-VTI3_Wi-Fi5.xml" >nul 2>&1
+)
+netsh wlan connect name="VTI3" >nul 2>&1
+netsh wlan connect name="VTI3_Wi-Fi5" >nul 2>&1
+
+:: Проверяем, появился ли интернет после попытки подключения
 ping -n 1 -w 1000 8.8.8.8 >nul 2>&1
 if %errorlevel% neq 0 (
-    timeout /t 3 >nul
+    timeout /t 5 >nul
     goto wait_for_internet
 )
 echo [+] Интернет подключен!
