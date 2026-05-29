@@ -181,5 +181,32 @@ start "" "windowsdefender://threat"
 pause
 goto main_menu
 
+
+:run_auto
+cls
+echo ===================================================
+echo           АВТОМАТИЧЕСКИЙ РЕЖИМ ЗАПУЩЕН
+echo ===================================================
+echo.
+
+echo [1/6] Запускаю Snappy Driver Installer...
+cd SDI_RUS\SDI
+start "" "SDI_x64_R2604.exe" -autoinstall
+cd ..\..
+
+echo [2/6] Запускаю MInstAll...
+cd core
+start "" cmd /c "install.bat"
+cd ..
+
+echo [3/6] Запускаю установку Microsoft Office 2021...
+cd "Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d"
+start "" "Setup.exe"
+cd /d "%~dp0"
+
+:: Временно возвращаемся в меню. 
+:: На следующем шаге мы заменим этот переход на ожидание интернета.
+goto main_menu
+
 :end
 exit
