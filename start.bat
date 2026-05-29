@@ -39,21 +39,19 @@ echo ===================================================
 
 :: Запрашиваем ввод от пользователя (БЕЗ нажатия Enter)
 choice /C 1234567890 /N /M " Выбери нужный пункт: "
+set "choice_res=%errorlevel%"
 
-if %errorlevel% equ 1 goto run_minstall
-if %errorlevel% equ 2 goto run_sdi
-if %errorlevel% equ 3 goto run_office
-if %errorlevel% equ 4 goto run_massgrave
-if %errorlevel% equ 5 goto run_debloat
-if %errorlevel% equ 6 goto run_icons
-if %errorlevel% equ 7 goto run_wifi
-if %errorlevel% equ 8 goto run_defender
-if %errorlevel% equ 9 goto run_auto
-if %errorlevel% equ 10 goto end
+if %choice_res% equ 1 call :run_minstall
+if %choice_res% equ 2 call :run_sdi
+if %choice_res% equ 3 call :run_office
+if %choice_res% equ 4 call :run_massgrave
+if %choice_res% equ 5 call :run_debloat
+if %choice_res% equ 6 call :run_icons
+if %choice_res% equ 7 call :run_wifi
+if %choice_res% equ 8 call :run_defender
+if %choice_res% equ 9 call :run_auto
+if %choice_res% equ 10 goto end
 
-echo.
-echo [ОШИБКА] Неверный пункт меню! Попробуй еще раз.
-pause
 goto main_menu
 
 :run_minstall
