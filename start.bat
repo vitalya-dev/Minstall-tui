@@ -14,7 +14,7 @@ if %errorLevel% NEQ 0 (
 )
 :: ===================================================
 
-:: Делаем корень флешки рабочей папкой (это очень важно после перезапуска с админом!)
+:: Делаем корень флешки рабочей папкой
 cd /d "%~dp0"
 
 :main_menu
@@ -90,12 +90,12 @@ set "ARCHIVE_PASSWORD=1"
 if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
     if not exist "%ZIP_FILE%" (
         echo [ОШИБКА] Архив "%ZIP_FILE%" не найден!
-        pause
+        timeout /t 3 >nul
         exit /b
     )
     if not exist "%SEVEN_ZIP%" (
         echo [ОШИБКА] 7z.exe не найден в корне флешки!
-        pause
+        timeout /t 3 >nul
         exit /b
     )
  
@@ -105,7 +105,7 @@ if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
     if errorlevel 1 (
         echo [ОШИБКА] Не удалось распаковать архив!
         echo Проверьте пароль сейчас: %ARCHIVE_PASSWORD%
-        pause
+        timeout /t 3 >nul
         exit /b
     )
     echo [+] Готово!
@@ -119,7 +119,7 @@ if exist "%MAS_SCRIPT%" (
 ) else (
     echo [ОШИБКА] MAS_AIO.cmd не найден!
     echo Проверь структуру архива.
-    pause
+    timeout /t 3 >nul
     exit /b
 )
 
@@ -140,7 +140,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcon
 start "" powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $cp=[Environment]::GetFolderPath('CommonPrograms'); $up=[Environment]::GetFolderPath('Programs'); @('Word.lnk', 'Excel.lnk', 'PowerPoint.lnk') | ForEach-Object { $c=$cp+'\'+$_; $u=$up+'\'+$_; if(Test-Path $c){Copy-Item $c $d -Force} elseif(Test-Path $u){Copy-Item $u $d -Force} }"
 echo.
 echo [УСПЕШНО] Значки добавлены на рабочий стол!
-pause
+timeout /t 2 >nul
 exit /b
 
 :run_wifi
@@ -166,7 +166,7 @@ netsh wlan connect name="VTI3_Wi-Fi5" >nul 2>&1
 
 echo.
 echo [ГОТОВО] Сети импортированы, команды на подключение отправлены!
-pause
+timeout /t 2 >nul
 exit /b
 
 :run_defender
@@ -174,9 +174,8 @@ echo.
 echo Открываю раздел "Защита от вирусов и угроз"...
 echo.
 start "" "windowsdefender://threat"
-pause
+timeout /t 2 >nul
 exit /b
-
 
 :run_auto
 cls
@@ -184,7 +183,6 @@ echo ===================================================
 echo           АВТОМАТИЧЕСКИЙ РЕЖИМ ЗАПУЩЕН
 echo ===================================================
 
-:: Вызываем модули (они сами выведут текст о своем запуске)
 call :run_sdi
 call :run_minstall
 call :run_office
@@ -217,15 +215,13 @@ if %errorlevel% equ 0 (
 echo [+] Установка Office завершена!
 
 call :run_massgrave
-
-:: Трюк: передаем пустой ввод, чтобы пропустить команду pause внутри модуля run_icons
-echo. | call :run_icons
+call :run_icons
 
 echo.
 echo ===================================================
 echo     АВТОМАТИЧЕСКИЙ РЕЖИМ УСПЕШНО ЗАВЕРШЕН!
 echo ===================================================
-pause
+timeout /t 4 >nul
 exit /b
 
 :end
