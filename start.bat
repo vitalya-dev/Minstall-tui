@@ -91,12 +91,12 @@ if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
     if not exist "%ZIP_FILE%" (
         echo [ОШИБКА] Архив "%ZIP_FILE%" не найден!
         pause
-        goto main_menu
+        exit /b
     )
     if not exist "%SEVEN_ZIP%" (
         echo [ОШИБКА] 7z.exe не найден в корне флешки!
         pause
-        goto main_menu
+        exit /b
     )
  
     echo [-] Распаковываю запароленный архив, подожди...
@@ -106,7 +106,7 @@ if not exist "%EXTRACT_TO%\MAS\All-In-One-Version-KL\MAS_AIO.cmd" (
         echo [ОШИБКА] Не удалось распаковать архив!
         echo Проверьте пароль сейчас: %ARCHIVE_PASSWORD%
         pause
-        goto main_menu
+        exit /b
     )
     echo [+] Готово!
 )
@@ -120,11 +120,11 @@ if exist "%MAS_SCRIPT%" (
     echo [ОШИБКА] MAS_AIO.cmd не найден!
     echo Проверь структуру архива.
     pause
-    goto main_menu
+    exit /b
 )
 
 timeout /t 2 >nul
-goto main_menu
+exit /b
 
 :run_debloat
 echo.
@@ -137,12 +137,11 @@ echo.
 echo Добавляю значки на рабочий стол...
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{5399E694-6CE5-4D6C-8FCE-1D8870FDCBA0}" /t REG_DWORD /d 0 /f >nul
-:: Запуск PowerShell в видимом режиме
 start "" powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $cp=[Environment]::GetFolderPath('CommonPrograms'); $up=[Environment]::GetFolderPath('Programs'); @('Word.lnk', 'Excel.lnk', 'PowerPoint.lnk') | ForEach-Object { $c=$cp+'\'+$_; $u=$up+'\'+$_; if(Test-Path $c){Copy-Item $c $d -Force} elseif(Test-Path $u){Copy-Item $u $d -Force} }"
 echo.
 echo [УСПЕШНО] Значки добавлены на рабочий стол!
 pause
-goto main_menu
+exit /b
 
 :run_wifi
 echo.
@@ -168,7 +167,7 @@ netsh wlan connect name="VTI3_Wi-Fi5" >nul 2>&1
 echo.
 echo [ГОТОВО] Сети импортированы, команды на подключение отправлены!
 pause
-goto main_menu
+exit /b
 
 :run_defender
 echo.
