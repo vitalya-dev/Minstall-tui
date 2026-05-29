@@ -60,7 +60,7 @@ echo Запускаю MInstAll...
 cd core
 start "" cmd /c "install.bat"
 cd ..
-goto main_menu
+exit /b
 
 :run_sdi
 echo.
@@ -68,7 +68,7 @@ echo Запускаю Snappy Driver Installer...
 cd SDI_RUS\SDI
 start "" "SDI_x64_R2604.exe" -autoinstall
 cd ..\..
-goto main_menu
+exit /b
 
 :run_office
 echo.
@@ -76,7 +76,7 @@ echo Запускаю установку Microsoft Office 2021...
 cd "Microsoft Office LTSC 2021 Final + Project Pro + Visio Pro\Microsoft Office LTSC 2021 Final RUS x86_x64\ru_office_professional_plus_2021_x86_x64_dvd_2c455c8d"
 start "" "Setup.exe"
 cd /d "%~dp0"
-goto main_menu
+exit /b
 
 :run_massgrave
 echo.
@@ -129,9 +129,8 @@ goto main_menu
 :run_debloat
 echo.
 echo Запускаю Win11Debloat...
-:: Убрали -WindowStyle Hidden для видимости работы скрипта
 start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "& ([scriptblock]::Create((irm 'https://debloat.raphi.re/'))) -CLI -Silent -RunDefaults"
-goto main_menu
+exit /b
 
 :run_icons
 echo.
@@ -177,7 +176,7 @@ echo Открываю раздел "Защита от вирусов и угро
 echo.
 start "" "windowsdefender://threat"
 pause
-goto main_menu
+exit /b
 
 
 :run_auto
