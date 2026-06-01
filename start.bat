@@ -183,37 +183,24 @@ echo ===================================================
 echo           АВТОМАТИЧЕСКИЙ РЕЖИМ ЗАПУЩЕН
 echo ===================================================
 
+:: Запускаем основные установки
 call :run_sdi
 call :run_minstall
 call :run_office
 
 echo.
-echo Ожидание установки драйверов, Wi-Fi и интернета...
-:wait_for_internet
-if exist "wifi_profiles\Беспроводная сеть-VTI3.xml" netsh wlan add profile filename="wifi_profiles\Беспроводная сеть-VTI3.xml" >nul 2>&1
-if exist "wifi_profiles\Беспроводная сеть-VTI3_Wi-Fi5.xml" netsh wlan add profile filename="wifi_profiles\Беспроводная сеть-VTI3_Wi-Fi5.xml" >nul 2>&1
-netsh wlan connect name="VTI3" >nul 2>&1
-netsh wlan connect name="VTI3_Wi-Fi5" >nul 2>&1
+echo [ОЖИДАНИЕ] Даем 10 минут на установку драйверов и софта...
+timeout /t 600
 
-ping -n 1 -w 1000 8.8.8.8 >nul 2>&1
-if %errorlevel% neq 0 (
-    timeout /t 5 >nul
-    goto wait_for_internet
-)
-echo [+] Интернет подключен!
+:: Теперь, когда драйверы сети вероятнее всего установлены, подключаемся к Wi-Fi
+call :run_wifi
 
+timeout /t 4 >nul
+
+:: Запускаем скрипт очистки (ему может понадобиться интернет)
 call :run_debloat
 
-echo.
-echo Ожидание завершения установки Office 2021...
-:wait_for_office
-tasklist /fi "imagename eq setup.exe" | find /i "setup.exe" >nul
-if %errorlevel% equ 0 (
-    timeout /t 5 >nul
-    goto wait_for_office
-)
-echo [+] Установка Office завершена!
-
+:: Активация и финальные штрихи
 call :run_massgrave
 call :run_icons
 
